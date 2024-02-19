@@ -20,7 +20,7 @@ namespace RazorPagesMovie.Pages_Movies
             _context = context;
         }
 
-        public IList<Movie> Movie { get;set; } = default!;
+        public IList<Movie> Movies { get;set; } = default!;
 
         [BindProperty(SupportsGet = true)]
         public string? SearchString { get;set; }
@@ -34,7 +34,15 @@ namespace RazorPagesMovie.Pages_Movies
 
         public async Task OnGetAsync()
         {
-            Movie = await _context.Movie.ToListAsync();
+            var moviesQuery = from m in _context.Movie
+                              select m;
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                moviesQuery = moviesQuery.Where(s => s.Title.Contains(SearchString));
+            }
+
+            Movies = await moviesQuery.ToListAsync();
         }
     }
 }
